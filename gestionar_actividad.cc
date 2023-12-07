@@ -1,13 +1,13 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
-#include <vector>
+#include <limits>
 #include <string>
+#include <vector>
+#include <sstream>
+#include <algorithm>
 
 using namespace std;
 
-
-// Declaración de la clase Actividad
 class Actividad {
 public:
     string nombre;
@@ -18,232 +18,275 @@ public:
     string categoria;
     double precio;
 
-    // Constructor de la clase Actividad
-    Actividad(string nom, string desc, string fecha, string ubic, int plazas, string cat, double prec) {
-        nombre = nom;
-        descripcion = desc;
-        fecha_hora = fecha;
-        ubicacion = ubic;
-        plazas_disponibles = plazas;
-        categoria = cat;
-        precio = prec;
-    }
+    // Constructor de la clase
+    Actividad(string nom, string desc, string fecha, string ubic, int plazas, string cat, double prec)
+        : nombre(nom), descripcion(desc), fecha_hora(fecha), ubicacion(ubic), plazas_disponibles(plazas), categoria(cat), precio(prec) {}
 
-    // Método para obtener detalles de la actividad
-    string obtenerDetalles() const {
-    stringstream detalles;
-    detalles << "Nombre: " << nombre << "\nDescripción: " << descripcion << "\nFecha y Hora: " << fecha_hora
-             << "\nUbicación: " << ubicacion << "\nPlazas Disponibles: " << plazas_disponibles
-             << "\nCategoría: " << categoria << "\nPrecio: " << precio << "\n\n";
-    return detalles.str();
-    }
+    // Método para obtener detalles de una actividad
+    string obtenerDetalles() const;
 
+    // Método estático para mostrar actividades desde un archivo
+    static vector<Actividad> mostrar(const string& nombreArchivo);
+    
+    // Método estático para crear una nueva actividad
+    static Actividad crearActividad();
+
+    // Método estático para guardar una actividad en un archivo
+    static void guardarActividadEnArchivo(const Actividad& nuevaActividad, const string& nombreArchivo);
+
+    // Método estático para editar una actividad
+    static void editarActividad(vector<Actividad>& actividades);
+
+    // Método estático para eliminar una actividad
+    static void eliminarActividad(vector<Actividad>& actividades);
 };
-// Función para crear una nueva actividad
-Actividad crearActividad() {
+
+// Método para obtener detalles de una actividad
+string Actividad::obtenerDetalles() const {
+    stringstream detalles;
+    detalles << "Nombre: " << nombre << "\n"
+             << "Descripción: " << descripcion << "\n"
+             << "Fecha y Hora: " << fecha_hora << "\n"
+             << "Ubicación: " << ubicacion << "\n"
+             << "Plazas Disponibles: " << plazas_disponibles << "\n"
+             << "Categoría: " << categoria << "\n"
+             << "Precio: " << precio << "\n";
+
+    return detalles.str();
+}   
+
+// Método estático para mostrar actividades desde un archivo
+vector<Actividad> Actividad::mostrar(const string& nombreArchivo) {
+    vector<Actividad> actividades;
+    ifstream archivo(nombreArchivo);
+
+    // Verifica si el archivo se pudo abrir
+    if (!archivo.is_open()) {
+        cerr << "No se pudo abrir el archivo '" << nombreArchivo << "'." << endl;
+        return actividades;
+    }
+
+    // Lee y muestra actividades desde el archivo
+    while (archivo.peek() != EOF) {
+        string nombre, descripcion, fecha_hora, ubicacion, categoria;
+        int plazas_disponibles;
+        double precio;
+
+        // Lee datos de la actividad desde el archivo
+        if (getline(archivo >> ws, nombre) &&
+            getline(archivo >> ws, descripcion) &&
+            getline(archivo >> ws, fecha_hora) &&
+            getline(archivo >> ws, ubicacion) &&
+            getline(archivo >> ws, categoria) &&
+            (archivo >> plazas_disponibles) &&
+            (archivo >> precio)) {
+
+            // Crea una nueva actividad y la añade al vector
+            Actividad nueva_actividad(nombre, descripcion, fecha_hora, ubicacion, plazas_disponibles, categoria, precio);
+            actividades.push_back(nueva_actividad);
+            
+            // Muestra la actividad inmediatamente después de leerla
+            cout << nueva_actividad.obtenerDetalles() << endl;
+        } else {
+            cerr << "Error al leer datos de actividad desde el archivo." << endl;
+            break;
+        }
+
+        // Consume el carácter de nueva línea después de leer el precio
+        archivo.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+
+    // Cierra el archivo
+    archivo.close();
+    return actividades;
+}
+
+// Método estático para crear una nueva actividad
+Actividad Actividad::crearActividad() {
     string nombre, descripcion, fecha_hora, ubicacion, categoria;
     int plazas_disponibles;
     double precio;
 
+    // Solicita al usuario ingresar datos para la nueva actividad
     cout << "Ingrese el nombre de la actividad: ";
-    getline(cin, nombre);
+    getline(cin >> ws, nombre);
 
     cout << "Ingrese la descripción de la actividad: ";
-    getline(cin, descripcion);
+    getline(cin >> ws, descripcion);
 
-    cout << "Ingrese la fecha y hora de la actividad (formato: dd/mm/aaaa hh:mm): ";
-    getline(cin, fecha_hora);
+    cout << "Ingrese la fecha y hora de la actividad: ";
+    getline(cin >> ws, fecha_hora);
 
     cout << "Ingrese la ubicación de la actividad: ";
-    getline(cin, ubicacion);
-
-    cout << "Ingrese el número de plazas disponibles: ";
-    cin >> plazas_disponibles;
-    cin.ignore();
+    getline(cin >> ws, ubicacion);
 
     cout << "Ingrese la categoría de la actividad: ";
-    getline(cin, categoria);
+    getline(cin >> ws, categoria);
+
+    cout << "Ingrese el número de plazas disponibles: ";
+    while (!(cin >> plazas_disponibles) || plazas_disponibles < 0) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Por favor, ingrese un número válido de plazas: ";
+    }
 
     cout << "Ingrese el precio de la actividad: ";
-    cin >> precio;
-
-    Actividad nueva_actividad(nombre, descripcion, fecha_hora, ubicacion, plazas_disponibles, categoria, precio);
-    return nueva_actividad;
-}
-
-// Función para obtener actividades desde un archivo
-vector<Actividad> obtenerActividades() {
-    vector<Actividad> actividades;
-    ifstream archivo("actividades.txt");
-
-    if (archivo.is_open()) {
-        while (true) {
-            string nombre, descripcion, fecha_hora, ubicacion, categoria;
-            int plazas_disponibles;
-            double precio;
-
-            // Intenta leer cada componente de la actividad
-            if (getline(archivo, nombre) &&
-                getline(archivo, descripcion) &&
-                getline(archivo, fecha_hora) &&
-                getline(archivo, ubicacion) &&
-                archivo >> plazas_disponibles &&
-                archivo.ignore() &&
-                getline(archivo, categoria) &&
-                archivo >> precio) {
-
-                Actividad nueva_actividad(nombre, descripcion, fecha_hora, ubicacion, plazas_disponibles, categoria, precio);
-                actividades.push_back(nueva_actividad);
-            } else {
-                break;  // Sale del bucle si no se pueden leer más líneas
-            }
-        }
-        archivo.close();
-    } else {
-        cout << "No se pudo abrir el archivo 'actividades.txt'." << endl;
+    while (!(cin >> precio) || precio < 0) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Por favor, ingrese un precio válido: ";
     }
 
-    return actividades;
+    // Crea y devuelve una nueva actividad con los datos ingresados
+    return Actividad(nombre, descripcion, fecha_hora, ubicacion, plazas_disponibles, categoria, precio);
 }
 
+// Método estático para guardar una actividad en un archivo
+void Actividad::guardarActividadEnArchivo(const Actividad& nuevaActividad, const string& nombreArchivo) {
+    ofstream archivo(nombreArchivo, ios::app); // Modo de apertura: ios::app para agregar al final del archivo
 
-// Función para mostrar actividades
-void mostrarActividades(const vector<Actividad>& actividades) {
-    for (size_t i = 0; i < actividades.size(); ++i) {
-        cout << "Actividad " << i + 1 << ":\n" << actividades[i].obtenerDetalles() << endl;
+    // Verifica si el archivo se pudo abrir
+    if (!archivo.is_open()) {
+        cerr << "No se pudo abrir el archivo '" << nombreArchivo << "'." << endl;
+        return;
     }
+
+    // Escribe los datos de la nueva actividad en el archivo
+    archivo << nuevaActividad.nombre << endl
+            << nuevaActividad.descripcion << endl
+            << nuevaActividad.fecha_hora << endl
+            << nuevaActividad.ubicacion << endl
+            << nuevaActividad.categoria << endl
+            << nuevaActividad.plazas_disponibles << endl
+            << nuevaActividad.precio << endl;
+
+    // Cierra el archivo
+    archivo.close();
 }
 
-// Función para editar actividad
-void editarActividad(vector<Actividad>& actividades) {
-    string nombre_buscar;
+// Método estático para editar una actividad
+void Actividad::editarActividad(vector<Actividad>& actividades) {
+    if (actividades.empty()) {
+        cout << "No hay actividades para editar." << endl;
+        return;
+    }
+
+    // Solicita al usuario el nombre de la actividad a editar
     cout << "Ingrese el nombre de la actividad que desea editar: ";
-    getline(cin, nombre_buscar);
+    string nombreEditar;
+    getline(cin >> ws, nombreEditar);
 
-    bool actividad_encontrada = false;
-
-    for (size_t i = 0; i < actividades.size(); ++i) {
-        if (actividades[i].nombre == nombre_buscar) {
-            actividad_encontrada = true;
-
-            // Mostrar los detalles de la actividad encontrada
-            cout << "Detalles de la actividad:\n";
-            cout << actividades[i].obtenerDetalles() << endl;
-
-            // Pedir al usuario los nuevos datos
-            Actividad nueva_actividad = crearActividad();
-
-            // Actualizar los datos de la actividad encontrada
-            actividades[i].nombre = nueva_actividad.nombre;
-            actividades[i].descripcion = nueva_actividad.descripcion;
-            actividades[i].fecha_hora = nueva_actividad.fecha_hora;
-            actividades[i].ubicacion = nueva_actividad.ubicacion;
-            actividades[i].plazas_disponibles = nueva_actividad.plazas_disponibles;
-            actividades[i].categoria = nueva_actividad.categoria;
-            actividades[i].precio = nueva_actividad.precio;
-
-            // Actualizar el archivo con los datos actualizados
-            ofstream archivo("actividades.txt");
-            if (archivo.is_open()) {
-                for (const Actividad& actividad : actividades) {
-                    archivo << actividad.obtenerDetalles();
-                }
-                archivo.close();
-                cout << "La actividad ha sido editada y los cambios se han guardado en 'actividades.txt'." << endl;
-            } else {
-                cout << "No se pudo abrir el archivo para guardar los cambios." << endl;
-            }
-
-            break; // Terminar el bucle al encontrar la actividad
+    // Busca la actividad por nombre y la edita si la encuentra
+    for (Actividad& actividad : actividades) {
+        if (actividad.nombre == nombreEditar) {
+            cout << "Ingrese nuevos datos para la actividad '" << actividad.nombre << "':" << endl;
+            // Utiliza la función existente para crear una nueva actividad
+            Actividad nuevaActividad = Actividad::crearActividad();
+            actividad = nuevaActividad;
+            cout << "Actividad editada correctamente." << endl;
+            return;
         }
     }
 
-    if (!actividad_encontrada) {
-        cout << "No se encontró ninguna actividad con ese nombre." << endl;
-    }
+    cout << "No se encontró ninguna actividad con el nombre '" << nombreEditar << "'." << endl;
 }
 
-
-
-void eliminarActividad(vector<Actividad>& actividades, const string& nombre_actividad) {
-    bool eliminado = false;
-    for (auto it = actividades.begin(); it != actividades.end();) {
-        if (it->nombre == nombre_actividad) {
-            it = actividades.erase(it);
-            eliminado = true;
-        } else {
-            ++it;
-        }
+// Método estático para eliminar una actividad
+void Actividad::eliminarActividad(vector<Actividad>& actividades) {
+    if (actividades.empty()) {
+        cout << "No hay actividades para eliminar." << endl;
+        return;
     }
 
-    if (eliminado) {
-        ofstream archivo("actividades.txt");
-        if (archivo.is_open()) {
-            for (const Actividad& actividad : actividades) {
-                archivo << actividad.obtenerDetalles();
-            }
-            archivo.close();
-            cout << "La actividad ha sido eliminada y los cambios se han guardado en 'actividades.txt'." << endl;
-        } else {
-            cout << "No se pudo abrir el archivo para guardar los cambios." << endl;
-        }
+    // Solicita al usuario el nombre de la actividad a eliminar
+    cout << "Ingrese el nombre de la actividad que desea eliminar: ";
+    string nombreEliminar;
+    getline(cin >> ws, nombreEliminar);
+
+    // Busca la actividad por nombre y la elimina si la encuentra
+    auto it = std::remove_if(actividades.begin(), actividades.end(),
+                             [&nombreEliminar](const Actividad& actividad) {
+                                 return actividad.nombre == nombreEliminar;
+                             });
+
+    if (it != actividades.end()) {
+        actividades.erase(it, actividades.end());
+        cout << "Actividad eliminada correctamente." << endl;
     } else {
-        cout << "No se encontró ninguna actividad con ese nombre." << endl;
+        cout << "No se encontró ninguna actividad con el nombre '" << nombreEliminar << "'." << endl;
     }
 }
 
-
-// Función principal
 int main() {
-    vector<Actividad> actividades = obtenerActividades();
+    while (true) {
+        // Menú principal
+        cout << "\n====== Menú: ======\n"
+             << "1. Mostrar actividades\n"
+             << "2. Crear nueva actividad\n"
+             << "3. Editar actividad\n"
+             << "4. Eliminar actividad\n"
+             << "5. Salir\n"
+             << "Seleccione una opción: ";
 
-    char opcion;
-    do {
-        cout << "Selecciona una opción:\n";
-        cout << "1. Mostrar actividades\n";
-        cout << "2. Crear actividad\n";
-        cout << "3. Editar actividad\n";
-        cout << "4. Eliminar actividad\n";
-        cout << "5. Salir\n";
-        cout << "Ingrese su opción: ";
-        cin >> opcion;
-        cin.ignore();
+        int opcion;
+        while (!(cin >> opcion) || opcion < 1 || opcion > 5) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Opción no válida. Ingrese un número del 1 al 5: ";
+        }
 
+        cout << "=====================\n";
+
+
+        // Realiza la acción correspondiente según la opción seleccionada
         switch (opcion) {
-            case '1':
-                mostrarActividades(actividades);
+            case 1:
+                // Leer y mostrar actividades
+                Actividad::mostrar("actividades.txt");
                 break;
-            case '2': {
-                Actividad nueva_actividad = crearActividad();
-                actividades.push_back(nueva_actividad);
 
-                ofstream archivo("actividades.txt", ios::app);
-                if (archivo.is_open()) {
-                    archivo << nueva_actividad.obtenerDetalles();
-                    archivo.close();
-                    cout << "La actividad ha sido creada y los cambios se han guardado en 'actividades.txt'." << endl;
-                } else {
-                    cout << "No se pudo abrir el archivo para guardar los cambios." << endl;
+            case 2:
+                // Crear nueva actividad
+                {
+                    Actividad nuevaActividad = Actividad::crearActividad();
+                    vector<Actividad> actividades = Actividad::mostrar("actividades.txt");
+                    actividades.push_back(nuevaActividad);
+                    Actividad::guardarActividadEnArchivo(nuevaActividad, "actividades.txt");
+                    cout << "Nueva actividad creada y guardada." << endl;
                 }
                 break;
-            }
-            case '3':
-                editarActividad(actividades);
-                break;
-            case '4': {
-                string nombre_actividad;
-                cout << "Ingrese el nombre de la actividad que desea eliminar: ";
-                getline(cin, nombre_actividad);
-                eliminarActividad(actividades, nombre_actividad);
-                break;
-            }
-            case '5':
-                cout << "Saliendo del programa." << endl;
-                break;
-            default:
-                cout << "Opción no válida. Inténtalo de nuevo." << endl;
-        }
-    } while (opcion != '5');
 
-    return 0;
+            case 3:
+                // Editar actividad
+                {
+                    vector<Actividad> actividades = Actividad::mostrar("actividades.txt");
+                    Actividad::editarActividad(actividades);
+                    ofstream archivo("actividades.txt");
+                    for (const Actividad& actividad : actividades) {
+                        Actividad::guardarActividadEnArchivo(actividad, "actividades.txt");
+                    }
+                }
+                break;
+
+            case 4:
+                // Eliminar actividad
+                {
+                    vector<Actividad> actividades = Actividad::mostrar("actividades.txt");
+                    Actividad::eliminarActividad(actividades);
+                    ofstream archivo("actividades.txt");
+                    for (const Actividad& actividad : actividades) {
+                        Actividad::guardarActividadEnArchivo(actividad, "actividades.txt");
+                    }
+                }
+                break;
+
+            case 5:
+                // Salir del programa
+                cout << "Saliendo del programa." << endl;
+                return 0;
+
+            default:
+                cout << "Opción no válida." << endl;
+        }
+    }
 }

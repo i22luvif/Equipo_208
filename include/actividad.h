@@ -51,7 +51,7 @@ public:
     static void guardarActividad(const Actividad& nuevaActividad, const string& nombreArchivo);
 
     // Método estático para mostrar las personas inscritas en una actividad
-    static void mostrarInscritos(const string& nombreActividad);
+    static void mostrarPreinscritos(const string& nombreActividad);
 };
 
 

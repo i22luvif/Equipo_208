@@ -1,9 +1,13 @@
-#include "actividad.h"
+#include "../include/actividad.h"
 
 using namespace std;
 
 // Método para mostrar detalles de una actividad
 void Actividad::mostrar(const vector<Actividad>& actividades) {
+    if (actividades.empty()) {
+        cout << "No hay actividades disponibles." << endl;
+        return;
+    }
     for (const Actividad& actividad : actividades) {
         cout << "\n"
              << "Nombre: " << actividad.nombre << "\n"
@@ -83,7 +87,7 @@ void Actividad::guardarActividad(const Actividad& nuevaActividad, const string& 
 }
 
 // Método estático para mostrar las personas inscritas en una actividad
-void Actividad::mostrarInscritos(const string& nombreActividad) {
+void Actividad::mostrarPreinscritos(const string& nombreActividad) {
     ifstream archivoPreinscritos("preinscritos.txt");
 
     // Verifica si el archivo se pudo abrir

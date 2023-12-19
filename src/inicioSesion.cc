@@ -1,10 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <limits>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <algorithm>
+
 #include "inicioSesion.h"
 
 inicioSesion::inicioSesion() : usuario("", "") {}

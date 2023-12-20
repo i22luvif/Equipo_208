@@ -1,5 +1,5 @@
 
-#include "inicioSesion.h"
+#include "../include/inicioSesion.h"
 
 inicioSesion::inicioSesion() : usuario("", "") {}
 

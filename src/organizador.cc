@@ -1,12 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <limits>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <algorithm>
 #include "organizador.h"
-#include "actividad.h"
 
 // Método estático para crear una nueva actividad
 Actividad Organizador::crearActividad() {
@@ -49,61 +41,65 @@ Actividad Organizador::crearActividad() {
     return Actividad(nombre, descripcion, ponente, fecha_hora, ubicacion, plazas_disponibles, categoria, precio);
 }
 
-
-// Método estático para editar una actividad
+// Método estático para editar una actividad por número
 void Organizador::editarActividad(vector<Actividad>& actividades) {
     if (actividades.empty()) {
         cout << "No hay actividades para editar." << endl;
         return;
     }
-    //Solicita al usuraio el nombre de la actividad
-    cout << "\n";
-    cout << "Ingrese el nombre de la actividad que desea editar: ";
-    string nombreEditar;
-    getline(cin >> ws, nombreEditar);
 
-    //Busca el nombre de la actividad y la edita si la encuentra
-    for (Actividad& actividad : actividades) {
-        if (actividad.getNombre() == nombreEditar) {
-            cout << "Ingrese nuevos datos para la actividad '" << actividad.getNombre() << "':" << endl;
-            Actividad nuevaActividad = Organizador::crearActividad();
-            actividad = nuevaActividad;
-            cout << "Actividad editada correctamente." << endl;
-            return;
-        }
+    // Muestra la lista de actividades con sus números
+    cout << "Lista de actividades disponibles:" << endl;
+    for (size_t i = 0; i < actividades.size(); ++i) {
+        cout << i + 1 << ". " << actividades[i].getNombre() << endl;
     }
 
-    cout << "No se encontró ninguna actividad con el nombre '" << nombreEditar << "'." << endl;
+    // Solicita al usuario el número de la actividad que desea editar
+    cout << "Ingrese el número de la actividad que desea editar: ";
+    size_t numeroEditar;
+    while (!(cin >> numeroEditar) || numeroEditar < 1 || numeroEditar > actividades.size()) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Por favor, ingrese un número válido de actividad: ";
+    }
+
+    // Edita la actividad correspondiente al número proporcionado
+    cout << "Ingrese nuevos datos para la actividad '" << actividades[numeroEditar - 1].getNombre() << "':" << endl;
+    Actividad nuevaActividad = Organizador::crearActividad();
+    actividades[numeroEditar - 1] = nuevaActividad;
+    cout << "Actividad editada correctamente." << endl;
 }
 
-// Método estático para eliminar una actividad
+// Método estático para eliminar una actividad por número
 void Organizador::eliminarActividad(vector<Actividad>& actividades) {
     if (actividades.empty()) {
         cout << "No hay actividades para eliminar." << endl;
         return;
     }
-    cout << "\n";
-    //Solicita al usuario el nombre de la actividad que desea eliminar
-    cout << "Ingrese el nombre de la actividad que desea eliminar: ";
-    string nombreEliminar;
-    getline(cin >> ws, nombreEliminar);
 
-    //Busca la actividad por nombre y la elimina si la encuentra
-    auto it = std::remove_if(actividades.begin(), actividades.end(),
-                             [&nombreEliminar](const Actividad& actividad) {
-                                 return actividad.getNombre() == nombreEliminar;
-                             });
-
-    if (it != actividades.end()) {
-        actividades.erase(it, actividades.end());
-        cout << "Actividad eliminada correctamente." << endl;
-    } else {
-        cout << "No se encontró ninguna actividad con el nombre '" << nombreEliminar << "'." << endl;
+    // Muestra la lista de actividades con sus números
+    cout << "Lista de actividades disponibles:" << endl;
+    for (size_t i = 0; i < actividades.size(); ++i) {
+        cout << i + 1 << ". " << actividades[i].getNombre() << endl;
     }
+
+    // Solicita al usuario el número de la actividad que desea eliminar
+    cout << "Ingrese el número de la actividad que desea eliminar: ";
+    size_t numeroEliminar;
+    while (!(cin >> numeroEliminar) || numeroEliminar < 1 || numeroEliminar > actividades.size()) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Por favor, ingrese un número válido de actividad: ";
+    }
+
+    // Elimina la actividad correspondiente al número proporcionado
+    actividades.erase(actividades.begin() + numeroEliminar - 1);
+    cout << "Actividad eliminada correctamente." << endl;
 }
 
 
-int menu_organizador(){
+
+int menu_organizador() {
     while (true) {
         cout << "\n====== Menú: ======\n"
              << "1. Mostrar actividades\n"
@@ -145,8 +141,7 @@ int menu_organizador(){
             //Editar actividad
             case 3:
                 {
-                    vector<Actividad> actividades = Actividad::obtenerDetalles("actividades.txt");
-                    Actividad::mostrar(actividades);                    
+                    vector<Actividad> actividades = Actividad::obtenerDetalles("actividades.txt");                  
                     Organizador::editarActividad(actividades);
                     ofstream archivo("actividades.txt");
                     for (const Actividad& actividad : actividades) {
@@ -159,7 +154,6 @@ int menu_organizador(){
             case 4:
                 {
                     vector<Actividad> actividades = Actividad::obtenerDetalles("actividades.txt");
-                    Actividad::mostrar(actividades);
                     Organizador::eliminarActividad(actividades);
                     ofstream archivo("actividades.txt");
                     for (const Actividad& actividad : actividades) {
@@ -178,4 +172,3 @@ int menu_organizador(){
         }
     }
 }
-

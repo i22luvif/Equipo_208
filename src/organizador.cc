@@ -1,4 +1,4 @@
-#include "organizador.h"
+#include "../include/organizador.h"
 
 // Método estático para crear una nueva actividad
 Actividad Organizador::crearActividad() {
@@ -67,7 +67,6 @@ void Organizador::editarActividad(vector<Actividad>& actividades) {
     cout << "Ingrese nuevos datos para la actividad '" << actividades[numeroEditar - 1].getNombre() << "':" << endl;
     Actividad nuevaActividad = Organizador::crearActividad();
     actividades[numeroEditar - 1] = nuevaActividad;
-    cout << "Actividad editada correctamente." << endl;
 }
 
 // Método estático para eliminar una actividad por número
@@ -94,7 +93,6 @@ void Organizador::eliminarActividad(vector<Actividad>& actividades) {
 
     // Elimina la actividad correspondiente al número proporcionado
     actividades.erase(actividades.begin() + numeroEliminar - 1);
-    cout << "Actividad eliminada correctamente." << endl;
 }
 
 
@@ -143,6 +141,7 @@ int menu_organizador() {
                 {
                     vector<Actividad> actividades = Actividad::obtenerDetalles("actividades.txt");                  
                     Organizador::editarActividad(actividades);
+                    cout << "Actividad editada correctamente." << endl;
                     ofstream archivo("actividades.txt");
                     for (const Actividad& actividad : actividades) {
                         Actividad::guardarActividad(actividad, "actividades.txt");
@@ -159,6 +158,7 @@ int menu_organizador() {
                     for (const Actividad& actividad : actividades) {
                         Actividad::guardarActividad(actividad, "actividades.txt");
                     }
+                    cout << "Actividad eliminada correctamente." << endl;
                 }
                 break;
             

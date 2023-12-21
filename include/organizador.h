@@ -1,16 +1,8 @@
-#ifndef INICIOSESION_H
-#define INICIOSESION_H
+#ifndef ORGANIZADOR_H
+#define ORGANIZADOR_H
 
-#include <iostream>
-#include <fstream>
-#include <limits>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <algorithm>
 #include "actividad.h"
 #include "usuario.h"
-
 
 class Organizador : public Usuario {
 private:
@@ -32,5 +24,7 @@ public:
     static void eliminarActividad(vector<Actividad>& actividades);
 
 };
+int menu_organizador();
+
 
 #endif

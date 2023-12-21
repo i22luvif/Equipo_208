@@ -1,8 +1,8 @@
 #ifndef INICIOSESION_H
 #define INICIOSESION_H
 
-#include "actividad.h"
-#include "usuario.h"
+#include "../include/actividad.h"
+#include "../include/usuario.h"
 
 class inicioSesion {
 private:

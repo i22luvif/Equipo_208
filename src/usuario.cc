@@ -9,90 +9,57 @@
 #include "usuario.h"
 
 using namespace std;
-
-void Usuario::preinscribirse(vector<Actividad>& actividades) {
+void Usuario::preinscribirse(std::vector<Actividad>& actividades) {
     if (actividades.empty()) {
-        cout << "No hay actividades disponibles para preinscribirse." << endl;
+        std::cout << "No hay actividades disponibles para preinscribirse." << std::endl;
         return;
     }
 
-    // Muestra las actividades disponibles
-    cout << "Actividades disponibles para preinscribirse:\n";
-    for (const Actividad& actividad : actividades) {
-        cout << actividad.getNombre() << endl;
+    // Muestra las actividades disponibles numeradas
+    std::cout << "Actividades disponibles para preinscribirse:\n";
+    for (size_t i = 0; i < actividades.size(); ++i) {
+        std::cout << i + 1 << ". " << actividades[i].getNombre() << std::endl;
     }
 
-    cout << "\n";
-    // Solicita al usuario el nombre de la actividad en la que desea preinscribirse
-    cout << "Ingrese el nombre de la actividad en la que desea preinscribirse: ";
-    string nombreActividad;
-    getline(cin >> ws, nombreActividad);
+    std::cout << "\n";
+    // Solicita al usuario el número de la actividad en la que desea preinscribirse
+    int numeroActividad;
+    std::cout << "Ingrese el número de la actividad en la que desea preinscribirse: ";
+    std::cin >> numeroActividad;
 
-    // Busca la actividad por nombre
-    auto it = find_if(actividades.begin(), actividades.end(),
-                      [&nombreActividad](const Actividad& actividad) {
-                          return actividad.getNombre() == nombreActividad;
-                      });
+    // Verifica que el número esté dentro del rango válido
+    if (numeroActividad >= 1 && static_cast<size_t>(numeroActividad) <= actividades.size()) {
+        // Obtiene la actividad correspondiente
+        Actividad& actividadSeleccionada = actividades[static_cast<size_t>(numeroActividad) - 1];
 
-    if (it != actividades.end()) {
         // Verifica si hay plazas disponibles utilizando el método de acceso
-        if (it->getPlazasDisponibles() > 0) {
+        if (actividadSeleccionada.getPlazasDisponibles() > 0) {
             // Realiza la preinscripción y actualiza la cantidad de plazas disponibles
-            cout << "¡Preinscripción exitosa para la actividad '" << nombreActividad << "'!" << endl;
+            std::cout << "¡Preinscripción exitosa para la actividad '"
+                      << actividadSeleccionada.getNombre() << "'!" << std::endl;
+
             // Actualiza las plazas disponibles utilizando el método de acceso
-            it->setPlazasDisponibles(it->getPlazasDisponibles() - 1);  // Resta 1 a las plazas disponibles
+            actividadSeleccionada.setPlazasDisponibles(actividadSeleccionada.getPlazasDisponibles() - 1);
 
             // Obtén el nombre de usuario utilizando el método de acceso
-            string nombreUsuarioActual = getNombreUsuario();
+            std::string nombreUsuarioActual = getNombreUsuario();
 
             // Guarda la información en el archivo de preinscritos
-            ofstream archivoPreinscritos("preinscritos.txt", ios::app);
+            std::ofstream archivoPreinscritos("preinscritos.txt", std::ios::app);
             if (archivoPreinscritos.is_open()) {
-                archivoPreinscritos << nombreUsuarioActual << " - " << nombreActividad << endl;
+                archivoPreinscritos << nombreUsuarioActual << " - " << actividadSeleccionada.getNombre() << std::endl;
                 archivoPreinscritos.close();
             } else {
-                cerr << "No se pudo abrir el archivo de preinscritos." << endl;
+                std::cerr << "No se pudo abrir el archivo de preinscritos." << std::endl;
             }
         } else {
-            cout << "No hay plazas disponibles para la actividad '" << nombreActividad << "'." << endl;
+            std::cout << "No hay plazas disponibles para la actividad '"
+                      << actividadSeleccionada.getNombre() << "'." << std::endl;
         }
     } else {
-        cout << "No se encontró ninguna actividad con el nombre '" << nombreActividad << "'." << endl;
+        std::cout << "Número de actividad no válido." << std::endl;
     }
 }
-
-
-
-bool Usuario::autenticar(const string &archivoUsuarios) {
-    ifstream archivo(archivoUsuarios);
-
-    if (!archivo.is_open()) {
-        cerr << "No se pudo abrir el archivo 'log.txt'." << endl;
-        return false;
-    }
-
-    string lineaUsuario;
-    string lineaContrasena;
-    string lineaRol;
-
-    while (getline(archivo, lineaUsuario) && getline(archivo, lineaContrasena) && getline(archivo, lineaRol)) {
-        // Compara con el nombre de usuario almacenado en la instancia
-        if (lineaUsuario == nombreUsuario) {
-            // Compara con la contraseña almacenada en la instancia
-            if (lineaContrasena == contraseña) {
-                // Almacena el rol encontrado en la instancia
-                rol = lineaRol;
-
-                archivo.close();
-                return true; // Autenticación exitosa
-            }
-        }
-    }
-
-    archivo.close();
-    return false; // No se encontró coincidencia
-}
-
 
 int menu_usuario(Usuario usuario) {
      // Crear un usuario con nombre, nombre de usuario, contraseña y rol

@@ -1,6 +1,6 @@
-    #include "usuario.h"
-    #include "inicioSesion.h"
-    #include "organizador.h"
+#include "../include/usuario.h"
+#include "../include/inicioSesion.h"
+#include "../include/organizador.h"
 
     using namespace std; 
 
@@ -29,14 +29,11 @@
             // Obtener el rol de la instancia de Usuario dentro de inicioSesion
             if (usuario_log.getRol() == "Usuario") {
                 menu_usuario(usuario_log);
-                cout << "Menú de usuario no implementado aún." << endl;
             } else if (usuario_log.getRol()== "Organizador") {
                 menu_organizador();
-                cout << "Menú de organizador no implementado aún." << endl;
             }
         } else {
             cout << "Nombre de usuario o contraseña incorrectos." << endl;
-            // Puedes manejar la lógica para un inicio de sesión fallido aquí
         }
 
         return 0;

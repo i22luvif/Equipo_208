@@ -1,4 +1,4 @@
-#include "usuario.h"
+#include "../include/usuario.h"
 
 using namespace std;
 void Usuario::preinscribirse(std::vector<Actividad>& actividades) {
@@ -112,7 +112,7 @@ int menu_usuario(Usuario usuario) {
                 const Actividad& actividadSeleccionada = actividades[static_cast<size_t>(numeroActividad) - 1];
 
                 // Muestra las personas inscritas en la actividad
-                Actividad::mostrarInscritos(actividadSeleccionada.getNombre());
+                Actividad::mostrarPreinscritos(actividadSeleccionada.getNombre());
             }
                 break;
 

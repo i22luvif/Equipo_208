@@ -1,7 +1,7 @@
 #ifndef USUARIO_H
 #define USUARIO_H
 
-#include "actividad.h"
+#include "../include/actividad.h"
 
 using namespace std;
 

@@ -1,11 +1,3 @@
-#include <iostream>
-#include <fstream>
-#include <limits>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <algorithm>
-#include "actividad.h"
 #include "usuario.h"
 
 using namespace std;
@@ -62,8 +54,6 @@ void Usuario::preinscribirse(std::vector<Actividad>& actividades) {
 }
 
 int menu_usuario(Usuario usuario) {
-     // Crear un usuario con nombre, nombre de usuario, contraseña y rol
-
     // Vector para almacenar las actividades
     vector<Actividad> actividades; 
 
@@ -89,7 +79,6 @@ int menu_usuario(Usuario usuario) {
         switch (opcion) {
             case 1:
                 // Leer y mostrar actividades
-
                 actividades = Actividad::obtenerDetalles("actividades.txt");
                 Actividad::mostrar(actividades);
                 break;
@@ -100,14 +89,31 @@ int menu_usuario(Usuario usuario) {
                 usuario.preinscribirse(actividades);
                 break;
 
-            case 3:
-                // Mostrarusuario_log.getRol() == "Usuario") personas inscritas en una actividad
-                {
-                    cout << "Ingrese el nombre de la actividad para mostrar las personas inscritas: ";
-                    string nombreActividad;
-                    getline(cin >> ws, nombreActividad);
-                    Actividad::mostrarInscritos(nombreActividad);
+            case 3: {
+                // Mostrar personas inscritas en una actividad
+                actividades = Actividad::obtenerDetalles("actividades.txt");
+
+                // Muestra las actividades disponibles numeradas
+                cout << "Actividades disponibles:\n";
+                for (size_t i = 0; i < actividades.size(); ++i) {
+                    cout << i + 1 << ". " << actividades[i].getNombre() << endl;
                 }
+
+                // Solicita al usuario el número de la actividad en la que desea ver los inscritos
+                int numeroActividad;
+                cout << "Ingrese el número de la actividad para mostrar las personas inscritas: ";
+                while (!(cin >> numeroActividad) || numeroActividad < 1 || numeroActividad > actividades.size()) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Por favor, ingrese un número válido de actividad: ";
+                }
+
+                // Obtiene la actividad correspondiente al número proporcionado
+                const Actividad& actividadSeleccionada = actividades[static_cast<size_t>(numeroActividad) - 1];
+
+                // Muestra las personas inscritas en la actividad
+                Actividad::mostrarInscritos(actividadSeleccionada.getNombre());
+            }
                 break;
 
             case 4:
@@ -120,4 +126,3 @@ int menu_usuario(Usuario usuario) {
         }
     }
 }
- 

@@ -31,7 +31,7 @@
                 menu_usuario(usuario_log);
                 cout << "Menú de usuario no implementado aún." << endl;
             } else if (usuario_log.getRol()== "Organizador") {
-                menu_actividad();
+                menu_organizador();
                 cout << "Menú de organizador no implementado aún." << endl;
             }
         } else {

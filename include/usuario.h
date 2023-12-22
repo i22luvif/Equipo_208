@@ -1,13 +1,6 @@
 #ifndef USUARIO_H
 #define USUARIO_H
 
-#include <iostream>
-#include <fstream>
-#include <limits>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <algorithm>
 #include "actividad.h"
 
 using namespace std;
@@ -28,8 +21,9 @@ class Usuario {
         // Método para preinscribirse en una actividad
         void preinscribirse(vector<Actividad>& actividades);
         string getNombreUsuario() const { return nombreUsuario; }
+        string getContraseña() const { return contraseña; }
         string getRol() const { return rol; }
-        bool autenticar(const string &archivoUsuarios);
+        void setRol(const std::string &nuevoRol) { rol = nuevoRol; }
 
 };  
 
